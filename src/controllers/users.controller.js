@@ -1,5 +1,6 @@
 const passport = require("passport")
 const User = require("../models/User")
+const { faker } = require("@faker-js/faker")
 const LocalStrategy = require("passport-local").Strategy
 
 const usersCtrl = {
@@ -32,7 +33,12 @@ const usersCtrl = {
 				req.flash("error_msg", "The email is already in use")
 				res.redirect("/users/signup")
 			} else {
-				const newUser = new User({ name, email, password })
+				const newUser = new User({
+					name,
+					email,
+					password,
+					avatar: faker.image.avatar(),
+				})
 				newUser.password = await newUser.encryptPassword(password)
 				await newUser.save()
 				req.flash("success_msg", "You are registered")

@@ -2,7 +2,6 @@ const { normalize, schema } = require("normalizr")
 
 const debuggChat = (messages) => {
 	const arr = { id: "mensajes", chats: [] }
-	console.log("Mensajes: ", messages)
 	arr.chats = messages.map((item) => {
 		return {
 			id: item._id,

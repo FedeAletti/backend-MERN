@@ -2,7 +2,8 @@ const Messages = require("../models/Message")
 
 const messagesCtrl = {
 	renderAll: async (req, res) => {
-		res.render("chat/chat")
+		const { name, email, avatar } = req.user
+		res.render("chat/chat", { name, email, avatar })
 	},
 	save: async (message) => {
 		try {
@@ -20,7 +21,6 @@ const messagesCtrl = {
 
 			if (options?.sort == true) {
 				messages = await Messages.find({}).sort({ timestamp: 0 }).lean()
-				console.log(messages)
 				// res.render("chat/chat", { messages })
 			} else {
 				messages = await Messages.find({}).lean()
