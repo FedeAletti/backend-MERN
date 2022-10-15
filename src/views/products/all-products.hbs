@@ -1,0 +1,12 @@
+<div class="container">
+            <h1>Products:</h1>
+    <div class="row">
+        {{#if productsExist}}
+            {{#each products}}
+                {{> productCard}}
+            {{/each}}
+        {{else}}
+            <h1>No products found</h1>
+        {{/if}}
+    </div>
+</div>

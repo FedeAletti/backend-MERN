@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	<div class="container">
-		<a class="navbar-brand" href="/">NotesApp</a>
+		<a class="navbar-brand" href="/">Ecommerce
+			<i class="fa fa-shopping-basket" aria-hidden="true"></i></a>
 		<button
 			class="navbar-toggler"
 			type="button"
@@ -12,7 +13,10 @@
 		>
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<div class="collapse navbar-collapse" id="navbarNav">
+		<div
+			class="collapse navbar-collapse justify-content-between px-3"
+			id="navbarNav"
+		>
 			<ul class="navbar-nav">
 				<li class="nav-item">
 					<a class="nav-link active" aria-current="page" href="/">Home</a>
@@ -23,6 +27,9 @@
 			</ul>
 			<ul class="navbar-nav ml-auto">
 				{{#if user}}
+					<li class="nav-item">
+						<a class="nav-link" href="/chat">Chat room</a>
+					</li>
 					<li class="nav-item dropdown">
 						<a
 							class="nav-link dropdown-toggle"
@@ -31,11 +38,11 @@
 							data-bs-toggle="dropdown"
 							aria-expanded="false"
 						>
-							Notes
+							Products
 						</a>
 						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="/notes">All notes</a></li>
-							<li><a class="dropdown-item" href="/notes/add">Add a note</a></li>
+							<li><a class="dropdown-item" href="/products">All products</a></li>
+							<li><a class="dropdown-item" href="/products/add">Add a product</a></li>
 							<li><hr class="dropdown-divider" /></li>
 							<li><a class="dropdown-item" href="/users/logout">Logout</a></li>
 						</ul>

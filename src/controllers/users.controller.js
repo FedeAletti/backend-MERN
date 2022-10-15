@@ -46,7 +46,7 @@ const usersCtrl = {
 	},
 
 	signIn: passport.authenticate("local", {
-		successRedirect: "/notes",
+		successRedirect: "/",
 		failureRedirect: "/users/signin",
 		failureFlash: true,
 	}),
@@ -54,6 +54,7 @@ const usersCtrl = {
 	logOut: (req, res) => {
 		req.logout(() => {
 			req.flash("success_msg", "You are logged out now")
+			req.session.destroy()
 			res.redirect("/")
 		})
 	},

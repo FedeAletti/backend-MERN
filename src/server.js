@@ -6,9 +6,17 @@ const methodOverride = require("method-override")
 const flash = require("connect-flash")
 const session = require("express-session")
 const passport = require("passport")
+const MongoStore = require("connect-mongo")
+const { createServer } = require("http")
+const { Server } = require("socket.io")
+const socketCtrl = require("./controllers/sockets.controller")
 
 // Initializations
 const app = express()
+const httpServer = createServer(app)
+
+const io = new Server(httpServer, {})
+socketCtrl(io)
 require("./config/passport")
 
 // Settings
@@ -32,9 +40,19 @@ app.use(express.json())
 app.use(methodOverride("_method"))
 app.use(
 	session({
-		secret: "secret",
-		resave: true,
-		saveUninitialized: true,
+		store: MongoStore.create({
+			mongoUrl:
+				"mongodb+srv://fedeUsername:Mongo.0303@cluster0.0kdfdvp.mongodb.net/?retryWrites=true&w=majority",
+			mongoOptions: {
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+			},
+		}),
+
+		secret: "secreto",
+		cookie: { maxAge: 600000 },
+		resave: false,
+		saveUninitialized: false,
 	})
 )
 app.use(passport.initialize())
@@ -52,10 +70,11 @@ app.use((req, res, next) => {
 
 // Routes
 app.use(require("./routes/index.routes"))
-app.use(require("./routes/notes.routes"))
+app.use(require("./routes/products.routes"))
+app.use(require("./routes/chat.routes"))
 app.use(require("./routes/users.routes"))
 
 // Static Files
 app.use(express.static(path.join(__dirname, "public")))
 
-module.exports = app
+module.exports = { app, httpServer }
