@@ -1,0 +1,17 @@
+{{#if error}}
+	<div
+		class="alert alert-danger alert-dismissible fade show rounded"
+		role="alert"
+	>
+		{{error}}
+	</div>
+{{/if}}
+
+{{#each errors}}
+	<div
+		class="alert alert-danger alert-dismissible fade show rounded"
+		role="alert"
+	>
+		{{text}}
+	</div>
+{{/each}}
