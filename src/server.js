@@ -73,6 +73,8 @@ app.use(require("./routes/index.routes"))
 app.use(require("./routes/products.routes"))
 app.use(require("./routes/chat.routes"))
 app.use(require("./routes/users.routes"))
+app.use(require("./routes/info.routes"))
+app.use(require("./routes/random.routes"))
 
 // Static Files
 app.use(express.static(path.join(__dirname, "public")))
