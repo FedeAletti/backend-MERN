@@ -1,3 +1,4 @@
+const { loggerFile } = require("../config/logger")
 const Messages = require("../models/Message")
 
 const messagesCtrl = {
@@ -12,6 +13,7 @@ const messagesCtrl = {
 			await Messages.create(message)
 			return message
 		} catch (error) {
+			loggerFile.warn("Error in save() - messagesCtrl: " + error)
 			throw Error(error.message)
 		}
 	},
@@ -30,6 +32,7 @@ const messagesCtrl = {
 			// res.render("chat/chat", { messages })
 			return messages
 		} catch (error) {
+			loggerFile.warn("Error in getAll() - messagesCtrl: " + error)
 			throw Error(error.message)
 		}
 	},

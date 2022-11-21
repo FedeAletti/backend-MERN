@@ -1,5 +1,6 @@
 const express = require("express")
 const exphbs = require("express-handlebars")
+const compression = require("compression")
 const morgan = require("morgan")
 const path = require("path")
 const methodOverride = require("method-override")
@@ -37,6 +38,7 @@ app.set("view engine", ".hbs")
 app.use(morgan("dev"))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(compression())
 app.use(methodOverride("_method"))
 app.use(
 	session({

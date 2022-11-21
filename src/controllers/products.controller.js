@@ -1,3 +1,4 @@
+const { loggerFile } = require("../config/logger")
 const { createNFakeProducts } = require("../models/mocks")
 
 const productCtrl = {
@@ -14,6 +15,7 @@ const productCtrl = {
 				})
 			}
 		} catch (err) {
+			loggerFile.warn("Error in getAllProducts: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -23,6 +25,7 @@ const productCtrl = {
 			let product = createNFakeProducts(1)
 			res.render("products/product", { product })
 		} catch (err) {
+			loggerFile.warn("Error in getProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -36,6 +39,7 @@ const productCtrl = {
 			req.flash("success", "Product created successfully")
 			res.redirect("/products")
 		} catch (err) {
+			loggerFile.warn("Error in saveProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -45,6 +49,7 @@ const productCtrl = {
 			let product = createNFakeProducts(1)
 			res.render("products/edit-product", { product })
 		} catch (err) {
+			loggerFile.warn("Error in renderEditProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -54,6 +59,7 @@ const productCtrl = {
 			req.flash("success", "Product edited successfully")
 			res.redirect("/products")
 		} catch (err) {
+			loggerFile.warn("Error in editProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -63,6 +69,7 @@ const productCtrl = {
 			req.flash("success", "Product deleted successfully")
 			res.redirect("/products")
 		} catch (err) {
+			loggerFile.warn("Error in deleteProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},

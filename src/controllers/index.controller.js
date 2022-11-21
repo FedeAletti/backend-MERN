@@ -1,3 +1,5 @@
+const { loggerConsole, loggerFile } = require("../config/logger")
+
 const indexController = {}
 
 indexController.renderIndex = (req, res) => {

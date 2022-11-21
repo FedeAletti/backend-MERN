@@ -1,6 +1,8 @@
 const passport = require("passport")
 const User = require("../models/User")
 const { faker } = require("@faker-js/faker")
+const { loggerFile } = require("../config/logger")
+const logger = require("../config/logger")
 const LocalStrategy = require("passport-local").Strategy
 
 const usersCtrl = {
@@ -30,6 +32,9 @@ const usersCtrl = {
 		} else {
 			const emailUser = await User.findOne({ email: email })
 			if (emailUser) {
+				loggerFile.warn(
+					"User tried to register with an email already in use: " + email
+				)
 				req.flash("error_msg", "The email is already in use")
 				res.redirect("/users/signup")
 			} else {
@@ -58,11 +63,15 @@ const usersCtrl = {
 	}),
 
 	logOut: (req, res) => {
-		req.logout(() => {
-			req.flash("success_msg", "You are logged out now")
-			req.session.destroy()
-			res.redirect("/")
-		})
+		try {
+			req.logout(() => {
+				req.flash("success_msg", "You are logged out now")
+				req.session.destroy()
+				res.redirect("/")
+			})
+		} catch (e) {
+			logger.all(e)
+		}
 	},
 }
 
