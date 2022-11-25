@@ -20,6 +20,33 @@
 							{{/if}}
 						/>
 					</div>
+					<div class="form-group my-4 d-flex gap-1">
+						<div class="w-50" tooltip="Example AR: +54" flow="left">							
+							<input
+								type="number"
+								name="countryCode"
+								class="form-control "
+								placeholder="Code"
+								{{#if countryCode}}
+									value="{{countryCode}}"
+								{{/if}}
+							/>
+						</div>
+						<div>
+							<input
+								type="number"
+								name="cellphone"
+								class="form-control"
+								placeholder="Cellphone number"
+								{{#if cellphone}}
+									value="{{cellphone}}"
+								{{/if}}
+							/>
+						</div>
+					</div>
+					<div class="form-group my-4" tooltip="Feature in progress 🦺" flow="left">
+						<input type="file" name="image" placeholder="Sube tu foto!" class="form-control"  disabled>
+					</div>
 					<div class="form-group my-4">
 						<input
 							type="email"

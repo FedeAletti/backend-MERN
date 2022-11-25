@@ -1,4 +1,4 @@
-const logger = require("../config/logger")
+const { errorLogger } = require("../config/logger")
 const normalizeMessages = require("../helpers/normalizeMessagges")
 const messagesController = require("./messages.controller")
 
@@ -19,7 +19,7 @@ const socketCtrl = (io) => {
 		})
 	})
 	io.on("error", (err) => {
-		logger.error("Error en socket.io: " + err)
+		errorLogger.error("Error en socket.io: " + err)
 	})
 }
 

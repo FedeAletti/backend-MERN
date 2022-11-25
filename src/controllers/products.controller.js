@@ -1,11 +1,27 @@
-const { loggerFile } = require("../config/logger")
+const Product = require("../models/Product")
 const { createNFakeProducts } = require("../models/mocks")
+const fs = require("fs")
+const { logger, errorLogger } = require("../config/logger")
 
 const productCtrl = {
 	getAllProducts: async (req, res) => {
-		// await res.send(createNFakeProducts(5))
 		try {
-			let products = createNFakeProducts(5)
+			const products = await Product.find({}).lean()
+
+			// products.forEach((product) => {
+			// 	product.price = product.price.toLocaleString("es-AR", {
+			// 		style: "currency",
+			// 		currency: "ARS",
+			// 	})
+			// 	console.log(product.price)
+			// })
+
+			products.forEach((product) => {
+				// save the ObjectId as a string
+				product.id = product._id.toString()
+				console.log(product.id)
+			})
+
 			if (products.length > 0) {
 				res.render("products/all-products", { products, productsExist: true })
 			} else {
@@ -15,17 +31,27 @@ const productCtrl = {
 				})
 			}
 		} catch (err) {
-			loggerFile.warn("Error in getAllProducts: " + err)
+			errorLogger.warn("Error in getAllProducts: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
 
 	getProduct: async (req, res) => {
 		try {
-			let product = createNFakeProducts(1)
+			let product = await Product.findById({ _id: req.params.id }).lean()
+			console.log(product)
+
+			product = {
+				name: product.name,
+				price: product.price,
+				description: product.description,
+				id: product._id.toString(),
+				thumbnail: product.thumbnail,
+			}
+
 			res.render("products/product", { product })
 		} catch (err) {
-			loggerFile.warn("Error in getProduct: " + err)
+			errorLogger.warn("Error in getProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -36,10 +62,25 @@ const productCtrl = {
 
 	saveProduct: async (req, res) => {
 		try {
+			const { name, description, price, thumbnail, stock } = req.body
+
+			const newProduct = new Product({
+				name,
+				description,
+				price,
+				thumbnail,
+				stock,
+			})
+
+			console.log(newProduct)
+
+			newProduct.save(newProduct)
+
+			logger.info("New product added: " + newProduct)
 			req.flash("success", "Product created successfully")
-			res.redirect("/products")
+			res.redirect("/products/add")
 		} catch (err) {
-			loggerFile.warn("Error in saveProduct: " + err)
+			logger.warn("Error in saveProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
@@ -49,27 +90,30 @@ const productCtrl = {
 			let product = createNFakeProducts(1)
 			res.render("products/edit-product", { product })
 		} catch (err) {
-			loggerFile.warn("Error in renderEditProduct: " + err)
+			logger.warn("Error in renderEditProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
 
 	editProduct: async (req, res) => {
 		try {
+			logger.info("Product edited: " + req.params.id)
 			req.flash("success", "Product edited successfully")
 			res.redirect("/products")
 		} catch (err) {
-			loggerFile.warn("Error in editProduct: " + err)
+			logger.warn("Error in editProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},
 
 	deleteProduct: async (req, res) => {
 		try {
+			await Product.findByIdAndDelete({ _id: req.params.id })
+			logger.info("Product deleted: " + req.params.id)
 			req.flash("success", "Product deleted successfully")
 			res.redirect("/products")
 		} catch (err) {
-			loggerFile.warn("Error in deleteProduct: " + err)
+			logger.warn("Error in deleteProduct: " + err)
 			req.flash("error", "Something went wrong")
 		}
 	},

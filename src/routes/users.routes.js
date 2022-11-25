@@ -3,10 +3,12 @@ const { Router } = require("express")
 const router = Router()
 
 const userCtrl = require("../controllers/users.controller")
+const { upLoad, uploadFile } = require("../helpers/uploadFiles")
 
 router.get("/users/signup", userCtrl.renderSignUpForm)
 
 router.post("/users/signup", userCtrl.signUp)
+// router.post("/users/signup", upLoad, uploadFile)
 
 router.get("/users/signin", userCtrl.renderSignInForm)
 
