@@ -1,22 +1,85 @@
 <div>
-	<h1>Hola</h1>
-	{{!-- {{#if productsExist}}
-		{{#each products}}
-			{{#if @first}}
-				<div class="cart-item">
-					<div class="cart-item__name">Name</div>
-					<div class="cart-item__price">Price</div>
-					<div class="cart-item__quantity">Quantity</div>
-					<div class="cart-item__total">Total</div>
-				</div>
-			{{/if}}
-			<div class="cart-item">
-				<div class="cart-item__name">{{name}}</div>
-				<div class="cart-item__price">{{price}}</div>
-				<div class="cart-item__quantity">{{quantity}}</div>
-				<div class="cart-item__total">{{total}}</div>
+	{{#if productsExist}}
+		<h1>Último paso!</h1>
+		<div class="row gap-5">
+			<div class="col-md-7">
+				<table>
+					<thead class="thead-cart">
+						<tr>
+							<th>&nbsp;</th>
+							<th>Product</th>
+							<th>Price</th>
+							<th>Quantity</th>
+							<th>total</th>
+							<th>&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody id="tbodyCart">
+						{{#each products}}
+							<tr class="tr-cart">
+								<td>
+									<div
+										class="td-image"
+										style="background-image: url({{thumbnail}});"
+									></div>
+								</td>
+								<td>
+									<div class="product-info">
+										<span>{{name}} </span>
+									</div>
+								</td>
+								<td>${{price}}</td>
+								<td class="td-quantity">
+									<div class="input-group">
+										<input
+											type="text"
+											name="quantity"
+											class="quantity form-control input-number"
+											value="{{quantity}}"
+											min="1"
+											max="{{stock}}"
+										/>
+									</div>
+								</td>
+								<td>${{totalPrice}}</td>
+								<td class="delete-prod">
+									<button
+										type="button"
+										class="delete-product"
+										data-productID="{{id}}"
+										aria-label="delete"
+									>
+										<span aria-hidden="true"><i
+												class="fa fa-minus-square-o"
+												aria-hidden="true"
+											></i></span>
+									</button>
+								</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
 			</div>
-		{{/each}}
-	{{/if}} --}}
+			<div class="col-md-4">
+				<div class="card-body">
+					<form action="/cart/checkout/{{cartId}}" method="post">
+						<div class="text-left">
+							<p>El total de la compra es: <span>{{totalCart}}</span></p>
+						</div>
+						<div class="text-center">
+							<button type="submit" class="btn btn-primary w-100">
+								TERMINAR COMPRA
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	{{else}}
+		<div class="alert alert-warning" role="alert">
+			No hay productos en el carrito
+		</div>
+
+	{{/if}}
 
 </div>

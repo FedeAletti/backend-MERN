@@ -3,36 +3,33 @@ const { createTransport } = require("nodemailer")
 const { logger, errorLogger } = require("../config/logger")
 
 let MAIL = process.env.GMAIL_MAIL
+let MAILPASS = process.env.GMAIL_PASS
 
 const transporter = createTransport({
 	service: "gmail",
 	port: 587,
 	auth: {
 		user: MAIL,
-		pass: process.env.GMAIL_PASS,
+		pass: MAILPASS,
 	},
 })
 
-const sendEmail = async ({ username, name, age, address, phone, image }) => {
+const sendEmail = async (user) => {
 	try {
+		const { name, age, address, email, phone, avatar } = user
 		const mailOptions = {
-			from: MAIL,
+			from: "Proyecto Backend",
 			to: MAIL,
 			subject: `Nuevo Usuario Registrado:`,
 			html: `
                     <h1>NUEVO USUARIO REGISTRADO</h1>
-                    <h2>El Sr/Sra ${name} se ha registrado exitosamente con su usuario: ${username}</h2>
-                    <p>Edad: ${age}</p>
-                    <p>Direccion: ${address}</p>
+                    <h2>El Sr/Sra ${name}</h2>
+					<p>Edad: ${age}</p>
                     <p>Telefono Celular: ${phone}</p>
-                    <img src="${image}" />
+					<p>Dirección: ${address}</p>
+                    <p>Correo: ${email}</p>
+                    <img src="${avatar}" />
                     `,
-			// attachments: [
-			// 	{
-			// 		filename: `${image}`,
-			// 		path: path.join(__dirname, "../public/uploads/") + image,
-			// 	},
-			// ],
 		}
 		const info = await transporter.sendMail(mailOptions)
 		logger.info({ message: "Mail de registro enviado", info })
@@ -43,18 +40,21 @@ const sendEmail = async ({ username, name, age, address, phone, image }) => {
 
 const sendPurchaseEmail = async (formattedProducts, user) => {
 	try {
-		const { username, name, age, address, phone, image } = user
+		const { name, email } = user
 
 		const mailOptions = {
 			from: MAIL,
 			to: MAIL,
-			subject: `Nuevo pedido de: ${name}, ${username}`,
+			subject: `Nuevo pedido de: ${name}`,
 			html: `
                 <h1>NUEVO PEDIDO</h1>
                 
                 <div>La compra fue la siguiente:</div>
-                <div><p>${formattedProducts.join("</p><p>")}</p></div>
-                </div>
+                <div>
+					<ul>${formattedProducts}</ul>
+				</div>
+				<hr />
+				<div>El cliente es: ${name}, su correo: ${email}</div>
             `,
 		}
 		const info = await transporter.sendMail(mailOptions)
@@ -63,3 +63,5 @@ const sendPurchaseEmail = async (formattedProducts, user) => {
 		errorLogger.error(err)
 	}
 }
+
+module.exports = { sendEmail, sendPurchaseEmail }

@@ -1,0 +1,33 @@
+<div class="card">
+	<div class="card-header">
+		<div class="d-flex justify-content-between align-items-center">
+			<h1>Hello
+				{{user.name}}!
+				<i class="fa fa-hand-spock-o" aria-hidden="true"></i></h1>
+		</div>
+	</div>
+	<div class="card-body">
+		<table class="table table-light">
+			<thead>
+				<tr>
+					<th scope="col">#</th>
+					<th scope="col">Name</th>
+					<th scope="col">Address</th>
+					<th scope="col">Phone</th>
+					<th scope="col">Email</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row">
+						<img src="{{user.avatar}}" alt="" />
+					</th>
+					<td>{{user.name}}</td>
+					<td>{{user.address}}</td>
+					<td>{{user.phone}}</td>
+					<td>{{user.email}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

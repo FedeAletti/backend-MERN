@@ -162,3 +162,52 @@ h1:hover [tooltip]::after,
 [tooltip][flow^="right"]:hover::after {
 	animation: tooltips-horz 300ms ease-out forwards;
 }
+
+/* TABLA DE PRODUCTOS */
+.thead-cart {
+	background: #cc5814;
+}
+
+.thead-cart th {
+	border: none;
+	padding: 30px;
+	font-size: 13px;
+	font-weight: 500;
+	color: white;
+}
+
+.tr-cart td {
+	border: none;
+	padding: 30px;
+	font-size: 14px;
+	background: #fff;
+	border-bottom: 4px solid #f8f9fd;
+	vertical-align: middle;
+}
+
+.product-info span {
+	display: block;
+	font-weight: 600;
+}
+
+.td-quantity {
+	width: 10%;
+}
+
+.delete-product {
+	padding: 0;
+	background-color: transparent;
+	border: 0;
+}
+
+.delete-product i {
+	font-size: 20px;
+	color: #cc5814;
+}
+
+.td-image {
+	height: 147px;
+	width: 147px;
+	background-position: center center;
+	background-size: contain;
+}

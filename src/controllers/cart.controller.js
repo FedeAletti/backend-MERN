@@ -1,22 +1,32 @@
 const { errorLogger, logger } = require("../config/logger")
 const Cart = require("../models/Cart")
 const Product = require("../models/Product")
+const { sendPurchaseEmail } = require("../services/mail.service")
+const sendSMS = require("../services/sms.service")
+const sendWhatsapp = require("../services/whatsapp.service")
 
 const cartController = {
 	getCart: async (req, res) => {
-		console.log("LLega")
-		// get user cart from mongo
 		try {
 			const userCart = await Cart.findOne({ userId: req.user._id }).lean()
 
 			// if user cart is empty, render empty cart
-			if (userCart.products.length === 0) {
+			if (!userCart) {
 				res.render("cart/cart", { productsExist: false })
 			} else {
 				// if user cart is not empty, render cart with products
+				let totalCart = 0
+				userCart.products.forEach((product) => {
+					product.id = product._id.toString()
+					product.totalPrice = product.price * product.quantity
+					totalCart += product.totalPrice
+				})
+
 				res.render("cart/cart", {
 					productsExist: true,
 					products: userCart.products,
+					totalCart,
+					cartId: userCart._id.toString(),
 				})
 			}
 		} catch (error) {
@@ -36,73 +46,105 @@ const cartController = {
 			if (!userCart) {
 				const newCart = new Cart({
 					userId: req.user._id,
-					products: [product],
+					products: [{ ...product, quantity: 1 }],
 				})
 
 				await newCart.save()
 			} else {
-				// if user cart is not empty, add product to cart
-				userCart.products.push(product)
-				await userCart.save()
+				// edit cart if exist adding the product
+				const productExist = userCart.products.find(
+					(product) => product._id.toString() === req.body.productId
+				)
+
+				if (productExist) {
+					// if product exist in cart, add quantity
+					const products = userCart.products.map((product) => {
+						if (product._id.toString() === req.body.productId) {
+							return { ...product, quantity: product.quantity + 1 }
+						} else {
+							return product
+						}
+					})
+
+					await Cart.findOneAndUpdate(
+						{ userId: req.user._id },
+						{ products: products }
+					)
+				} else {
+					// if product does not exist in cart, add product
+					const products = [...userCart.products, { ...product, quantity: 1 }]
+
+					await Cart.findOneAndUpdate(
+						{ userId: req.user._id },
+						{ products: products }
+					)
+				}
 			}
 			logger.info("Product added to cart")
-			// res.redirect("/cart")
+			res.redirect("/cart")
 		} catch (error) {
 			errorLogger.warn("Error in addToCart: " + error)
 		}
 	},
 
-	postCart: async (req, res) => {
-		try {
-		} catch (error) {}
-	},
-
-	deleteProdbyPage: async (req, res) => {
-		try {
-			// delete prod
-			const userCart = await Cart.findOne({ userId: req.user._id }).lean()
-			const prodId = req.params.id
-			const prodIndex = userCart.products.findIndex(
-				(prod) => prod._id.toString() === prodId
-			)
-
-			userCart.products.splice(prodIndex, 1)
-			await userCart.save()
-		} catch (error) {
-			errorLogger.warn("Error in deleteProdbyPage: " + error)
-		}
-	},
-
 	deleteProd: async (req, res) => {
 		try {
-			// delete prod
+			// delete prod and update cart
 			const userCart = await Cart.findOne({ userId: req.user._id }).lean()
-			const prodId = req.params.id
-			const prodIndex = userCart.products.findIndex(
-				(prod) => prod._id.toString() === prodId
+
+			const products = userCart.products.filter(
+				(product) => product._id.toString() !== req.body.productId
 			)
 
-			userCart.products.splice(prodIndex, 1)
-			await userCart.save()
+			await Cart.findOne({ userId: req.user._id }).updateOne({
+				products: products,
+			})
+
+			res.status(204).json({ message: "Product deleted" })
+
+			logger.info("Product deleted from cart")
 		} catch (error) {
 			errorLogger.warn("Error in deleteProd: " + error)
 		}
 	},
 
-	postBuy: async (req, res) => {
+	checkout: async (req, res) => {
 		//
 		try {
-			await sendPurchaseEmail(formattedProducts, user)
-			await sendSMS("La orden fue confirmada, su pedido esta en proceso")
+			// get cart from mongo
+			const userCart = await Cart.findOne({ userId: req.user._id }).lean()
+
+			// formate products to send to email
+			let products = ""
+			userCart.products.forEach((product) => {
+				products += `<li>${product.name} - ${product.quantity} - $${product.price}</li>`
+			})
+
+			// senders
+			await sendPurchaseEmail(products, req.user)
+			await sendSMS(
+				"La orden fue confirmada, su pedido esta en proceso",
+				req.user.phone
+			)
 			await sendWhatsapp(
-				"Se ha creado una nueva orden de compra de parte de: " + req.user.name
+				`Se ha creado una nueva orden de compra de parte de: ${req.user.name}`
 			)
 
-			res.redirect("/home")
+			// delete cart
+			await Cart.findOne({ userId: req.user._id }).deleteOne()
+
+			logger.info("New order: " + newUser.name)
+			req.flash(
+				"success_msg",
+				"Order in progress! You'll receive a confirmation email and SMS"
+			)
+			res.status(200).json({ message: "Order confirmed" })
+			res.redirect("/")
 		} catch (error) {
 			errorLogger.error({
 				error: error.message,
 			})
+			req.flash("error_msg", "Error in checkout, try again")
 			res.status(500).send({
 				status: 500,
 				message: error.message,

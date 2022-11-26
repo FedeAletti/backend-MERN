@@ -87,7 +87,7 @@ const productCtrl = {
 
 	renderEditProduct: (req, res) => {
 		try {
-			let product = createNFakeProducts(1)
+			let product = Product.findById({ _id: req.params.id }).lean()
 			res.render("products/edit-product", { product })
 		} catch (err) {
 			logger.warn("Error in renderEditProduct: " + err)
@@ -97,6 +97,24 @@ const productCtrl = {
 
 	editProduct: async (req, res) => {
 		try {
+			let productToEdit = await Product.findById({ _id: req.params.id }).lean()
+
+			const { name, description, price, thumbnail, stock } = req.body
+
+			productToEdit = {
+				name,
+				description,
+				price,
+				thumbnail,
+				stock,
+			}
+
+			await Product.findByIdAndUpdate(
+				{ _id: req.params.id },
+				{ $set: productToEdit },
+				{ new: true }
+			)
+
 			logger.info("Product edited: " + req.params.id)
 			req.flash("success", "Product edited successfully")
 			res.redirect("/products")

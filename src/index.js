@@ -14,8 +14,7 @@ console.log(numCPUs)
 
 const PORT = process.env.PORT || 8080
 
-/*
-if (cluster.isMaster) {
+if (cluster.isMaster && process.env.MODE == "CLUSTER") {
 	console.log(`Master ${process.pid} is running`)
 	// fork workers.
 	for (let i = 0; i < numCPUs; i++) {
@@ -28,12 +27,4 @@ if (cluster.isMaster) {
 } else {
 	httpServer.listen(PORT)
 	console.log(`Worker ${process.pid} started`)
-}*/
-
-httpServer.listen(PORT, () => {
-	console.log(`Servidor Funcionando en Puerto 8080: http://127.0.0.1:${PORT}`)
-	logger.info(`Servidor Funcionando en Puerto 8080: http://127.0.0.1:${PORT}`)
-})
-httpServer.on("error", (error) =>
-	errorLogger.error(`Error en servidor ${error}`)
-)
+}

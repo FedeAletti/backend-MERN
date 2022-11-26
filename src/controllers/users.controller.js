@@ -2,6 +2,7 @@ const passport = require("passport")
 const User = require("../models/User")
 const { faker } = require("@faker-js/faker")
 const { logger, errorLogger } = require("../config/logger")
+const { sendEmail } = require("../services/mail.service")
 const LocalStrategy = require("passport-local").Strategy
 
 const usersCtrl = {
@@ -10,12 +11,26 @@ const usersCtrl = {
 	},
 
 	signUp: async (req, res) => {
-		const { name, email, countryCode, cellphone, password, confirm_password } =
-			req.body
+		const {
+			name,
+			email,
+			address,
+			age,
+			countryCode,
+			cellphone,
+			password,
+			confirm_password,
+		} = req.body
 		const errors = []
 
 		if (name.length <= 0) {
 			errors.push({ text: "Please write a name" })
+		}
+		if (age < 18) {
+			errors.push({ text: "You must be 18 years old" })
+		}
+		if (address.length <= 0) {
+			errors.push({ text: "Please write an address" })
 		}
 		if (
 			countryCode.length <= 0 &&
@@ -47,6 +62,8 @@ const usersCtrl = {
 			} else {
 				const newUser = new User({
 					name,
+					address,
+					age,
 					phone: `+${countryCode}9${cellphone}`,
 					email,
 					password,
@@ -57,6 +74,7 @@ const usersCtrl = {
 				console.log(newUser)
 				newUser.password = await newUser.encryptPassword(password)
 				await newUser.save()
+				await sendEmail(req.user)
 				logger.info("New user registered: " + newUser.name)
 				req.flash("success_msg", "You are registered")
 				res.redirect("/users/signin")
@@ -73,6 +91,16 @@ const usersCtrl = {
 		failureRedirect: "/users/signin",
 		failureFlash: true,
 	}),
+
+	renderAccountInfo: async (req, res) => {
+		try {
+			const user = await User.findById(req.user.id).lean()
+			res.render("users/account", { user })
+		} catch (error) {
+			errorLogger.error("Error rendering account info: " + error)
+			req.flash("error_msg", "Something went wrong, please login again")
+		}
+	},
 
 	logOut: (req, res) => {
 		try {
